@@ -34,6 +34,7 @@ jobs:
           nuitka-version: main
           # Tên file script chính
           script-name: beautify_json_gemini_customtkinter.py
+          standalone: true
           onefile: true
           enable-plugins: tk-inter
         
