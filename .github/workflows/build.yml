@@ -44,4 +44,5 @@ jobs:
           # Tên của file zip bạn sẽ tải về
           name: json-converter-windows
           # Đường dẫn chính xác
-          path: build/beautify_json_gemini_customtkinter.exe
+          path: build
+          include-hidden-files: true
