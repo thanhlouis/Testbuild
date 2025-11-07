@@ -1,16 +1,13 @@
 # Tên của quy trình, bạn sẽ thấy tên này trong tab "Actions"
 name: Build Windows Executable
 
-# Quy trình này sẽ chạy khi nào:
+# Quy trình này sẽ chạy khi khi bạn đẩy code (push) lên nhánh "main" hoặc chạy thủ công
 on:
-  # 1. Khi bạn đẩy code (push) lên nhánh "main"
   push:
     branches: [ "main" ]
-  # 2. Cho phép bạn chạy thủ công từ tab "Actions"
   workflow_dispatch:
 
 jobs:
-  # Tên của "job" (công việc)
   build-windows:
     # BẮT BUỘC: Chỉ định máy ảo là Windows
     runs-on: windows-latest
@@ -20,26 +17,23 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      # Bước 2: Cài đặt môi trường Python 3.12
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+      # BƯỚC 2: BUILD SỬ DỤNG NUITKA ACTION (Đã thay thế 3 bước thủ công)
+      - name: Build with Nuitka Action
+        uses: Nuitka/Nuitka-Action@v1
         with:
-          python-version: '3.12'
-
-      # Bước 3: Cài đặt các thư viện Python cần thiết
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install nuitka customtkinter
-
-      # BƯỚC 4: CHẠY NUITKA (Sử dụng tên file của bạn)
-      # Nuitka sẽ tạo file: dist/beautify_json_gemini_customtkinter.exe
-      - name: Build with Nuitka
-        run: |
-          nuitka --onefile --plugin-enable=tk-inter --include-package-data=customtkinter --output-dir=dist --allow-downloads beautify_json_gemini_customtkinter.py
+          # Chỉ định phiên bản Python và Nuitka
+          nuitka-version: stable
+          python-version: 3.12
+          # Các tùy chọn của Nuitka
+          options: |
+            --onefile
+            --plugin-enable=tk-inter
+            --include-package-data=customtkinter
+            --output-dir=dist
+          # Tên file script chính
+          script-name: beautify_json_gemini_customtkinter.py
         
-      # BƯỚC 5: UPLOAD FILE ĐÃ BUILD
-      # Đường dẫn file phải khớp hoàn hảo với tên file đầu ra ở Bước 4
+      # BƯỚC 3: UPLOAD FILE ĐÃ BUILD (Bước này không thay đổi)
       - name: Upload executable artifact
         uses: actions/upload-artifact@v4
         with:
