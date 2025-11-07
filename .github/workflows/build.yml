@@ -1,0 +1,49 @@
+# Tên của quy trình, bạn sẽ thấy tên này trong tab "Actions"
+name: Build Windows Executable
+
+# Quy trình này sẽ chạy khi nào:
+on:
+  # 1. Khi bạn đẩy code (push) lên nhánh "main"
+  push:
+    branches: [ "main" ]
+  # 2. Cho phép bạn chạy thủ công từ tab "Actions"
+  workflow_dispatch:
+
+jobs:
+  # Tên của "job" (công việc)
+  build-windows:
+    # BẮT BUỘC: Chỉ định máy ảo là Windows
+    runs-on: windows-latest
+
+    steps:
+      # Bước 1: Lấy code của bạn từ repository về
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # Bước 2: Cài đặt môi trường Python 3.11
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # Bước 3: Cài đặt các thư viện Python cần thiết
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install nuitka customtkinter
+
+      # Bước 4: Chạy Nuitka (Lệnh build của bạn)
+      - name: Build with Nuitka
+        run: |
+          nuitka --onefile --plugin-enable=tk-inter --include-package-data=customtkinter --output-dir=dist beautify_json_gemini_customtkinter.py
+        # --output-dir=dist: Yêu cầu Nuitka đặt file .exe vào thư mục tên "dist"
+
+      # Bước 5: Tải file .exe lên làm "Artifact"
+      # Đây là bước giúp bạn tải file về sau khi build xong
+      - name: Upload executable artifact
+        uses: actions/upload-artifact@v4
+        with:
+          # Tên của file zip bạn sẽ tải về
+          name: json-converter-windows
+          # Đường dẫn đến file .exe vừa được build ở bước trên
+          path: dist/beautify_json_gemini_customtkinter.exe
