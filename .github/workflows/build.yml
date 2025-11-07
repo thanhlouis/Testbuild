@@ -16,22 +16,26 @@ jobs:
       # Bước 1: Lấy code của bạn từ repository về
       - name: Check out repository
         uses: actions/checkout@v4
+        
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12' # Version range or exact version of a Python version to use, using SemVer's version range syntax
+          architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
+
+      - name: Install Dependencies
+        run: |
+          pip install customtkinter
 
       # BƯỚC 2: BUILD SỬ DỤNG NUITKA ACTION (Đã thay thế 3 bước thủ công)
       - name: Build with Nuitka Action
-        uses: Nuitka/Nuitka-Action@v1
+        uses: Nuitka/Nuitka-Action@main
         with:
           # Chỉ định phiên bản Python và Nuitka
-          nuitka-version: stable
-          python-version: 3.12
-          # Các tùy chọn của Nuitka
-          options: |
-            --onefile
-            --plugin-enable=tk-inter
-            --include-package-data=customtkinter
-            --output-dir=dist
+          nuitka-version: main
           # Tên file script chính
           script-name: beautify_json_gemini_customtkinter.py
+          mode: standalone
+          enable-plugins: tk-inter
         
       # BƯỚC 3: UPLOAD FILE ĐÃ BUILD (Bước này không thay đổi)
       - name: Upload executable artifact
@@ -40,4 +44,4 @@ jobs:
           # Tên của file zip bạn sẽ tải về
           name: json-converter-windows
           # Đường dẫn chính xác
-          path: dist/beautify_json_gemini_customtkinter.exe
+          path: build/beautify_json_gemini_customtkinter.exe
